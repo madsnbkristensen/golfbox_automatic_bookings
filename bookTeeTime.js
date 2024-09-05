@@ -146,19 +146,6 @@ async function bookTeeTime() {
 
   await delay(5000);
 
-  // Wait for the submit button to be available and click it
-  /* const submitButton = await page.$("#Form1 .btn-primary");
-  if (submitButton) {
-    await delay(5000);
-    await page.click("#Form1 .btn-primary");
-    // Wait for booking to complete
-    await page.waitForNavigation({ waitUntil: "networkidle0" });
-    console.log("Tee time booked!");
-  } else {
-    console.error("Submit button not found.");
-  } */
-
-  // Check if the button is visible and not obstructed
   console.log("Starting button clickability check...");
 
   const isClickable = await page.evaluate(() => {
