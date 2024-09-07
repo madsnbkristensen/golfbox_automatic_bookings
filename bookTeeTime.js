@@ -12,6 +12,7 @@ function delay(ms) {
 async function bookTeeTime() {
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
+
   await page.goto(url);
 
   // Check if the cookie consent popup exists and click it
@@ -71,8 +72,12 @@ async function bookTeeTime() {
     return;
   }
 
+  const date = "20240914T142200";
+
   const bookingUrl =
-    "https://www.golfbox.dk/site/my_golfbox/ressources/booking/window.asp?Ressource_GUID={1C6D53A2-5E66-4FD6-89DB-424ADBF31A70}&Booking_Start=20240913T173000&club_GUID={6D58C6D7-DC20-4F54-A1B2-9A79EBD5ABDD}";
+    "https://www.golfbox.dk/site/my_golfbox/ressources/booking/window.asp?Ressource_GUID={1C6D53A2-5E66-4FD6-89DB-424ADBF31A70}&Booking_Start=" +
+    date +
+    "&club_GUID={6D58C6D7-DC20-4F54-A1B2-9A79EBD5ABDD}";
 
   await page.goto(bookingUrl);
 
@@ -146,42 +151,12 @@ async function bookTeeTime() {
 
   await delay(5000);
 
-  console.log("Starting button clickability check...");
+  page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
-  const isClickable = await page.evaluate(() => {
-    console.log("Inside page.evaluate()"); // This log is visible in the browser context, not the Node.js console.
+  const form = await page.$("#Form1");
+  await form.evaluate((form) => form.submit());
 
-    const button = document.querySelector("#cmdSubmit");
-
-    console.log("Button exists:", !!button);
-
-    if (!button) {
-      return false;
-    }
-
-    const isDisabled = button.disabled;
-    const hasWidth = button.offsetWidth > 0;
-    const hasHeight = button.offsetHeight > 0;
-
-    console.log("Button is disabled:", isDisabled);
-    console.log("Button width:", button.offsetWidth);
-    console.log("Button height:", button.offsetHeight);
-
-    return !isDisabled && hasWidth && hasHeight;
-  });
-
-  console.log("Button clickability check completed.");
-
-  if (isClickable) {
-    // Click the button
-    await page.click("#cmdSubmit");
-
-    // Wait for navigation or other action to complete
-    await page.waitForNavigation({ waitUntil: "networkidle0" });
-    console.log("Button clicked and navigation complete!");
-  } else {
-    console.error("Submit button is not clickable.");
-  }
+  console.log("Form submitted");
 
   await browser.close();
 }
